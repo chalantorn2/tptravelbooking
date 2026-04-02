@@ -177,6 +177,8 @@ const BookingForm = () => {
         const { error } = await createTourBooking({
           booking_id: Number(bookingKey),
           reference_id: refId,
+          booking_ref:
+            formElements[`tour_${fid}_booking_ref`]?.value || null,
           tour_date: tourDate,
           tour_pickup_time:
             formElements[`tour_${fid}_pickup_time`]?.value || null,
@@ -206,6 +208,8 @@ const BookingForm = () => {
         const { error } = await createTransferBooking({
           booking_id: Number(bookingKey),
           reference_id: refId,
+          booking_ref:
+            formElements[`transfer_${fid}_booking_ref`]?.value || null,
           transfer_date: transferDate,
           transfer_time:
             formElements[`transfer_${fid}_pickup_time`]?.value || null,
@@ -297,7 +301,9 @@ const BookingForm = () => {
           {bookingCounts && (
             <div className="bg-blue-50 p-2.5 border-b border-blue-100 text-center text-sm text-gray-600">
               This booking has{" "}
-              <b className="text-cyan-600">{bookingCounts.tourCount} tour(s)</b>{" "}
+              <b className="text-orange-600">
+                {bookingCounts.tourCount} tour(s)
+              </b>{" "}
               and{" "}
               <b className="text-teal-600">
                 {bookingCounts.transferCount} transfer(s)
@@ -399,7 +405,7 @@ const BookingForm = () => {
                 <button
                   type="button"
                   onClick={addTourForm}
-                  className="px-5 py-2 border-2 border-cyan-500 text-cyan-600 font-medium rounded-xl hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-2 text-sm"
+                  className="px-5 py-2 border-2 border-orange-500 text-orange-600 font-medium rounded-xl hover:bg-orange-500 hover:text-white transition-colors flex items-center gap-2 text-sm"
                 >
                   <Plus size={18} /> Add Tour
                 </button>

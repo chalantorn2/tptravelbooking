@@ -25,11 +25,11 @@ const BookingList = ({ bookings, type, isLoading, error, onViewDetails }) => {
 
   const translateStatus = (status) => {
     const map = {
-      pending: "Pending",
-      booked: "Booked",
-      in_progress: "In Progress",
-      completed: "Completed",
-      cancelled: "Cancelled",
+      pending: "รอดำเนินการ",
+      booked: "จองแล้ว",
+      in_progress: "กำลังดำเนินการ",
+      completed: "เสร็จสิ้น",
+      cancelled: "ยกเลิก",
     };
     return map[status] || status;
   };
@@ -46,7 +46,7 @@ const BookingList = ({ bookings, type, isLoading, error, onViewDetails }) => {
   };
 
   const getLeftBorderColor = () =>
-    type === "tour" ? "border-l-cyan-500" : "border-l-teal-500";
+    type === "tour" ? "border-l-orange-500" : "border-l-teal-500";
 
   if (isLoading) {
     return (
@@ -99,7 +99,7 @@ const BookingList = ({ bookings, type, isLoading, error, onViewDetails }) => {
                 </div>
                 <button
                   onClick={() => onViewDetails(booking, type)}
-                  className={`p-1.5 rounded-lg transition-colors ${type === "tour" ? "text-cyan-600 hover:bg-cyan-50" : "text-teal-600 hover:bg-teal-50"}`}
+                  className={`p-1.5 rounded-lg transition-colors ${type === "tour" ? "text-orange-600 hover:bg-orange-50" : "text-teal-600 hover:bg-teal-50"}`}
                 >
                   <Eye size={16} />
                 </button>
@@ -108,7 +108,7 @@ const BookingList = ({ bookings, type, isLoading, error, onViewDetails }) => {
               {/* Time & Date */}
               <div className="flex flex-wrap gap-2 mb-2">
                 <span
-                  className={`inline-flex items-center px-2.5 py-1 text-sm rounded-lg font-medium ${type === "tour" ? "bg-cyan-50 text-cyan-700" : "bg-teal-50 text-teal-700"}`}
+                  className={`inline-flex items-center px-2.5 py-1 text-sm rounded-lg font-medium ${type === "tour" ? "bg-orange-50 text-orange-700" : "bg-teal-50 text-teal-700"}`}
                 >
                   <Clock size={14} className="mr-1" />
                   {type === "tour"

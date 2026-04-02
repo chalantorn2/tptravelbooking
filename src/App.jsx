@@ -8,7 +8,10 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import BookingForm from './pages/BookingForm';
 import UsersManagement from './pages/UsersManagement';
+import Bookings from './pages/Bookings';
 import InformationManagement from './pages/InformationManagement';
+import Payment from './pages/Payment';
+import Report from './pages/Report';
 
 const App = () => {
   return (
@@ -24,9 +27,9 @@ const App = () => {
               <Route element={<PrivateRoute />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/booking-form" element={<BookingForm />} />
-                <Route path="/bookings" element={<div className="p-8"><h1 className="text-2xl font-bold text-gray-800">Bookings</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
-                <Route path="/payment" element={<div className="p-8"><h1 className="text-2xl font-bold text-gray-800">Payment</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
-                <Route path="/report" element={<div className="p-8"><h1 className="text-2xl font-bold text-gray-800">Report</h1><p className="text-gray-400 mt-2">Coming soon...</p></div>} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/report" element={<Report />} />
                 <Route path="/information" element={<InformationManagement />} />
 
                 {/* Admin only */}

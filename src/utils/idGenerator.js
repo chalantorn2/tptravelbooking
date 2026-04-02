@@ -1,17 +1,18 @@
 import api from '../services/api';
 
 export const generateBookingID = async (agentName = 'TP') => {
-  const prefix = agentName.substring(0, 3).toUpperCase().replace(/\s/g, '');
-  const date = new Date();
-  const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-  const random = Math.floor(Math.random() * 9000 + 1000);
-  return `${prefix}-${dateStr}-${random}`;
+  const { data, error } = await api.get(`/reference-id/index.php?type=booking&agent_name=${encodeURIComponent(agentName)}`);
+  if (error || !data?.reference_id) {
+    throw new Error('Failed to generate booking reference ID');
+  }
+  return data.reference_id;
 };
 
 export const generateSubBookingID = async (type) => {
-  const prefix = type === 'tour' ? 'T' : 'TR';
-  const date = new Date();
-  const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-  const random = Math.floor(Math.random() * 9000 + 1000);
-  return `${prefix}-${dateStr}-${random}`;
+  const apiType = type === 'tour' ? 'tour' : 'transfer';
+  const { data, error } = await api.get(`/reference-id/index.php?type=${apiType}`);
+  if (error || !data?.reference_id) {
+    throw new Error(`Failed to generate ${type} reference ID`);
+  }
+  return data.reference_id;
 };

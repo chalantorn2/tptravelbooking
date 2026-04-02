@@ -130,7 +130,7 @@ const BookingSelector = forwardRef(
                     <span className="bg-gray-100 px-2 py-0.5 rounded">
                       {booking.reference_id || `#${booking.id}`}
                     </span>
-                    <span className="bg-cyan-50 text-cyan-600 px-1.5 py-0.5 rounded">
+                    <span className="bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded">
                       {booking.tour_count || 0}T
                     </span>
                     <span className="bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded">

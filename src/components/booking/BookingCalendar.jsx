@@ -121,7 +121,7 @@ const BookingCalendar = ({ selectedDate, onDateSelect }) => {
           <span>Selected</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
+          <div className="w-2.5 h-2.5 rounded-full bg-orange-500" />
           <span>Tour</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -129,8 +129,8 @@ const BookingCalendar = ({ selectedDate, onDateSelect }) => {
           <span>Transfer</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500" />
-          <span>Both</span>
+          <div className="w-2.5 h-2.5 rounded-full bg-red-800" />
+          <span>ทั้งสอง</span>
         </div>
       </div>
 
@@ -162,12 +162,13 @@ const BookingCalendar = ({ selectedDate, onDateSelect }) => {
               let bookingStyle = "";
               if (!selected && bookingType) {
                 if (bookingType === "tour")
-                  bookingStyle = "bg-cyan-50 text-cyan-700 hover:bg-cyan-100";
+                  bookingStyle =
+                    "bg-orange-50 text-orange-700 hover:bg-orange-100";
                 else if (bookingType === "transfer")
                   bookingStyle = "bg-teal-50 text-teal-700 hover:bg-teal-100";
                 else
                   bookingStyle =
-                    "bg-gradient-to-br from-cyan-50 to-teal-50 text-gray-700 hover:from-cyan-100 hover:to-teal-100";
+                    "bg-gradient-to-br from-orange-50 to-teal-50 text-gray-700 hover:from-orange-100 hover:to-teal-100";
               }
 
               return (
@@ -186,7 +187,7 @@ const BookingCalendar = ({ selectedDate, onDateSelect }) => {
                   {bookingType && !selected && (
                     <span
                       className={`absolute bottom-1 w-1.5 h-1.5 rounded-full
-                      ${bookingType === "tour" ? "bg-cyan-500" : bookingType === "transfer" ? "bg-teal-500" : "bg-gradient-to-r from-cyan-500 to-teal-500"}
+                      ${bookingType === "tour" ? "bg-orange-500" : bookingType === "transfer" ? "bg-teal-500" : "bg-red-800"}
                     `}
                     />
                   )}

@@ -26,6 +26,37 @@ switch ($method) {
             $stmt = $db->prepare("SELECT * FROM tour_bookings WHERE booking_id = ?");
             $stmt->execute([$bookingId]);
             jsonResponse($stmt->fetchAll());
+        } elseif (isset($_GET['list'])) {
+            // Get all tour bookings with booking data and finance totals (for Payment page)
+            $sql = "
+                SELECT tb.*, b.first_name, b.last_name, b.agent_name, b.agent_id,
+                       b.reference_id as booking_reference_id,
+                       b.pax_adt, b.pax_chd, b.pax_inf,
+                       b.pax_adt as booking_pax_adt, b.pax_chd as booking_pax_chd, b.pax_inf as booking_pax_inf,
+                       COALESCE(SUM(bf.cost), 0) as cost_price,
+                       COALESCE(SUM(bf.sell), 0) as selling_price
+                FROM tour_bookings tb
+                LEFT JOIN bookings b ON tb.booking_id = b.id
+                LEFT JOIN booking_finances bf ON bf.booking_type = 'tour' AND bf.booking_item_id = tb.id
+            ";
+            $params = [];
+            $where = [];
+
+            if ($startDate && $endDate) {
+                $where[] = "tb.tour_date >= ? AND tb.tour_date <= ?";
+                $params[] = $startDate;
+                $params[] = $endDate;
+            }
+
+            if (!empty($where)) {
+                $sql .= " WHERE " . implode(' AND ', $where);
+            }
+
+            $sql .= " GROUP BY tb.id ORDER BY tb.tour_date DESC, tb.tour_pickup_time ASC";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            jsonResponse($stmt->fetchAll());
         } elseif ($startDate && $endDate) {
             // Get tour dates in range (for calendar highlights)
             $stmt = $db->prepare("SELECT DISTINCT tour_date FROM tour_bookings WHERE tour_date >= ? AND tour_date <= ?");
@@ -39,11 +70,12 @@ switch ($method) {
     case 'POST':
         $data = getJsonInput();
 
-        $stmt = $db->prepare("INSERT INTO tour_bookings (booking_id, reference_id, tour_date, tour_pickup_time, tour_type, tour_detail, tour_hotel, tour_room_no, tour_contact_no, province, send_to, status, note)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO tour_bookings (booking_id, reference_id, booking_ref, tour_date, tour_pickup_time, tour_type, tour_detail, tour_hotel, tour_room_no, tour_contact_no, province, send_to, status, note)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['booking_id'] ?? null,
             $data['reference_id'] ?? null,
+            $data['booking_ref'] ?? null,
             $data['tour_date'],
             $data['tour_pickup_time'] ?? null,
             $data['tour_type'] ?? null,
@@ -73,7 +105,7 @@ switch ($method) {
 
         $fields = [];
         $params = [];
-        $allowedFields = ['booking_id', 'reference_id', 'tour_date', 'tour_pickup_time', 'tour_type', 'tour_detail', 'tour_hotel', 'tour_room_no', 'tour_contact_no', 'province', 'send_to', 'payment_status', 'payment_date', 'payment_note', 'status', 'note'];
+        $allowedFields = ['booking_id', 'reference_id', 'booking_ref', 'tour_date', 'tour_pickup_time', 'tour_type', 'tour_detail', 'tour_hotel', 'tour_room_no', 'tour_contact_no', 'province', 'send_to', 'payment_status', 'payment_date', 'payment_note', 'status', 'note'];
 
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $data)) {

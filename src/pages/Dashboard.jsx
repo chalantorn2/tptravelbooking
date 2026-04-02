@@ -78,7 +78,7 @@ const Dashboard = () => {
   const summaryCards = [
     {
       key: "all",
-      label: "Total",
+      label: "ทั้งหมด",
       count: allBookings.length,
       icon: CalendarDays,
       color: "from-blue-600 to-blue-500",
@@ -88,7 +88,7 @@ const Dashboard = () => {
     },
     {
       key: "pending",
-      label: "Pending",
+      label: "รอดำเนินการ",
       count: countByStatus("pending"),
       icon: Clock,
       color: "from-gray-500 to-gray-400",
@@ -98,7 +98,7 @@ const Dashboard = () => {
     },
     {
       key: "booked",
-      label: "Booked",
+      label: "จองแล้ว",
       count: countByStatus("booked"),
       icon: Users,
       color: "from-blue-500 to-blue-400",
@@ -108,7 +108,7 @@ const Dashboard = () => {
     },
     {
       key: "in_progress",
-      label: "In Progress",
+      label: "กำลังดำเนินการ",
       count: countByStatus("in_progress"),
       icon: TrendingUp,
       color: "from-yellow-500 to-amber-400",
@@ -118,7 +118,7 @@ const Dashboard = () => {
     },
     {
       key: "completed",
-      label: "Completed",
+      label: "เสร็จสิ้น",
       count: countByStatus("completed"),
       icon: ArrowRightLeft,
       color: "from-emerald-500 to-emerald-400",
@@ -147,11 +147,11 @@ const Dashboard = () => {
 
   const translateStatus = (status) => {
     const map = {
-      pending: "Pending",
-      booked: "Booked",
-      in_progress: "In Progress",
-      completed: "Completed",
-      cancelled: "Cancelled",
+      pending: "รอดำเนินการ",
+      booked: "จองแล้ว",
+      in_progress: "กำลังดำเนินการ",
+      completed: "เสร็จสิ้น",
+      cancelled: "ยกเลิก",
     };
     return map[status] || status;
   };
@@ -284,7 +284,7 @@ const Dashboard = () => {
                           handleViewDetails(booking, booking._type)
                         }
                         className={`p-3 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-l-4 ${
-                          isTour ? "border-l-cyan-500" : "border-l-teal-500"
+                          isTour ? "border-l-orange-500" : "border-l-teal-500"
                         } border-gray-100 bg-white`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
@@ -292,7 +292,7 @@ const Dashboard = () => {
                             <span
                               className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
                                 isTour
-                                  ? "bg-cyan-100 text-cyan-700"
+                                  ? "bg-orange-100 text-orange-700"
                                   : "bg-teal-100 text-teal-700"
                               }`}
                             >
@@ -334,7 +334,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tour */}
           <div className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm">
-            <div className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white px-5 py-3 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-5 py-3 flex justify-between items-center">
               <h3 className="font-semibold flex items-center gap-2">
                 <Camera size={18} />
                 Tour Bookings

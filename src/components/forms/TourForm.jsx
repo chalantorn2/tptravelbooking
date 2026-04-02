@@ -4,18 +4,22 @@ import AutocompleteInput from "../ui/AutocompleteInput";
 import { useInformation } from "../../contexts/InformationContext";
 
 const TourForm = memo(({ id, data, onRemove }) => {
-  const { tourTypes, places, provinces, tourRecipients } = useInformation();
+  const { tourTypes, places, provinces, tourRecipients, addNewInformation } =
+    useInformation();
   const tourTypeOptions = tourTypes.map((t) => t.value);
   const placeOptions = places.map((p) => p.value);
   const provinceOptions = provinces.map((p) => p.value);
   const recipientOptions = tourRecipients.map((r) => r.value);
 
+  const handleAddNew = (category) => (value) =>
+    addNewInformation({ category, value });
+
   const inputClass =
-    "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400 transition-colors";
+    "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400 transition-colors";
 
   return (
-    <div className="bg-white border border-cyan-200 rounded-2xl overflow-hidden shadow-sm">
-      <div className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white px-4 py-2.5 flex justify-between items-center">
+    <div className="bg-white border border-orange-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-4 py-2.5 flex justify-between items-center">
         <span className="font-medium text-sm flex items-center gap-2">
           <Camera size={16} />
           Tour #{id}
@@ -30,7 +34,18 @@ const TourForm = memo(({ id, data, onRemove }) => {
       </div>
 
       <div className="p-4 space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Booking Ref
+            </label>
+            <input
+              name={`tour_${id}_booking_ref`}
+              defaultValue={data?.booking_ref || ""}
+              className={inputClass}
+              placeholder="Booking Ref"
+            />
+          </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">
               Tour Date *
@@ -67,6 +82,7 @@ const TourForm = memo(({ id, data, onRemove }) => {
               options={tourTypeOptions}
               className={inputClass}
               placeholder="Tour type"
+              onAddNew={handleAddNew("tour_type")}
             />
           </div>
           <div>
@@ -79,6 +95,7 @@ const TourForm = memo(({ id, data, onRemove }) => {
               options={recipientOptions}
               className={inputClass}
               placeholder="Send to"
+              onAddNew={handleAddNew("tour_recipient")}
             />
           </div>
         </div>
@@ -107,6 +124,7 @@ const TourForm = memo(({ id, data, onRemove }) => {
               options={placeOptions}
               className={inputClass}
               placeholder="Hotel name"
+              onAddNew={handleAddNew("place")}
             />
           </div>
           <div>
@@ -144,6 +162,7 @@ const TourForm = memo(({ id, data, onRemove }) => {
               options={provinceOptions}
               className={inputClass}
               placeholder="Province"
+              onAddNew={handleAddNew("province")}
             />
           </div>
         </div>

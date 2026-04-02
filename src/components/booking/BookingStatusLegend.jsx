@@ -2,11 +2,11 @@ import React from 'react';
 
 const BookingStatusLegend = () => {
   const statuses = [
-    { name: 'Pending', color: 'bg-gray-400' },
-    { name: 'Booked', color: 'bg-blue-500' },
-    { name: 'In Progress', color: 'bg-yellow-500' },
-    { name: 'Completed', color: 'bg-emerald-500' },
-    { name: 'Cancelled', color: 'bg-red-500' },
+    { name: 'รอดำเนินการ', color: 'bg-gray-400' },
+    { name: 'จองแล้ว', color: 'bg-blue-500' },
+    { name: 'กำลังดำเนินการ', color: 'bg-yellow-500' },
+    { name: 'เสร็จสิ้น', color: 'bg-emerald-500' },
+    { name: 'ยกเลิก', color: 'bg-red-500' },
   ];
 
   return (

@@ -4,7 +4,7 @@ import { Camera, Car } from "lucide-react";
 const BookingCounter = ({ tourCount, transferCount }) => {
   return (
     <div className="flex justify-center gap-4 py-2">
-      <div className="flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-2 rounded-xl border border-cyan-200">
+      <div className="flex items-center gap-2 bg-orange-50 text-orange-700 px-4 py-2 rounded-xl border border-orange-200">
         <Camera size={16} />
         <span className="text-sm font-medium">
           {tourCount} Tour{tourCount !== 1 ? "s" : ""}

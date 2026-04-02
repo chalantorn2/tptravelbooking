@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  Save,
-  Trash2,
-  User,
-  Plus,
-  DollarSign,
-} from "lucide-react";
+import { X, Save, Trash2, User, Plus, DollarSign } from "lucide-react";
 import {
   updateTourBooking,
   updateTransferBooking,
@@ -18,8 +11,20 @@ import {
   deleteBookingFinance,
 } from "../../services/bookingService";
 import { notify } from "../ui/Notification";
+import AutocompleteInput from "../ui/AutocompleteInput";
+import { useInformation } from "../../contexts/InformationContext";
 
 const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
+  const {
+    tourTypes,
+    transferTypes,
+    places,
+    provinces,
+    tourRecipients,
+    transferRecipients,
+    drivers,
+    vehicles,
+  } = useInformation();
   const [formData, setFormData] = useState({});
   const [finances, setFinances] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,12 +46,19 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
 
   const loadFinances = async () => {
     if (!booking?.id) return;
-    const { finances: data } = await fetchBookingFinances(bookingType, booking.id);
+    const { finances: data } = await fetchBookingFinances(
+      bookingType,
+      booking.id,
+    );
     setFinances(data);
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleAutoChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFinanceChange = (index, field, value) => {
@@ -58,7 +70,15 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
   const addFinanceRow = () => {
     setFinances([
       ...finances,
-      { id: null, booking_type: bookingType, booking_item_id: booking.id, cost: 0, sell: 0, type: "all", remark: "" },
+      {
+        id: null,
+        booking_type: bookingType,
+        booking_item_id: booking.id,
+        cost: 0,
+        sell: 0,
+        type: "all",
+        remark: "",
+      },
     ]);
   };
 
@@ -128,7 +148,7 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
     }
   };
 
-  const accentColor = bookingType === "tour" ? "cyan" : "teal";
+  const isTour = bookingType === "tour";
   const statusOptions = [
     "pending",
     "booked",
@@ -140,8 +160,14 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
   const inputClass =
     "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-colors";
 
-  const totalCost = finances.reduce((sum, r) => sum + (parseFloat(r.cost) || 0), 0);
-  const totalSell = finances.reduce((sum, r) => sum + (parseFloat(r.sell) || 0), 0);
+  const totalCost = finances.reduce(
+    (sum, r) => sum + (parseFloat(r.cost) || 0),
+    0,
+  );
+  const totalSell = finances.reduce(
+    (sum, r) => sum + (parseFloat(r.sell) || 0),
+    0,
+  );
   const totalProfit = totalSell - totalCost;
 
   return (
@@ -155,7 +181,7 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
       >
         {/* Header */}
         <div
-          className={`px-5 py-4 border-b flex justify-between items-center bg-${accentColor}-600 text-white rounded-t-2xl`}
+          className={`px-5 py-4 border-b flex justify-between items-center text-white rounded-t-2xl ${isTour ? "bg-orange-600" : "bg-teal-600"}`}
         >
           <span className="text-lg font-semibold">
             {bookingType === "tour" ? "Tour" : "Transfer"} Booking Details
@@ -191,10 +217,15 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                 <span className="text-gray-400 text-xs">Pax</span>
                 <p className="font-medium text-gray-700">
                   {[
-                    booking.booking_pax_adt > 0 && `${booking.booking_pax_adt} ADT`,
-                    booking.booking_pax_chd > 0 && `${booking.booking_pax_chd} CHD`,
-                    booking.booking_pax_inf > 0 && `${booking.booking_pax_inf} INF`,
-                  ].filter(Boolean).join(", ") || "0"}
+                    booking.booking_pax_adt > 0 &&
+                      `${booking.booking_pax_adt} ADT`,
+                    booking.booking_pax_chd > 0 &&
+                      `${booking.booking_pax_chd} CHD`,
+                    booking.booking_pax_inf > 0 &&
+                      `${booking.booking_pax_inf} INF`,
+                  ]
+                    .filter(Boolean)
+                    .join(", ") || "0"}
                 </p>
               </div>
               <div>
@@ -206,8 +237,20 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
             </div>
           </div>
 
-          {/* Status */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Booking Ref & Status */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">
+                Booking Ref
+              </label>
+              <input
+                name="booking_ref"
+                value={formData.booking_ref || ""}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Booking Ref"
+              />
+            </div>
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">
                 Status
@@ -220,9 +263,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
               >
                 {statusOptions.map((s) => (
                   <option key={s} value={s}>
-                    {s
-                      .replace("_", " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                    {{
+                      pending: "รอดำเนินการ",
+                      booked: "จองแล้ว",
+                      in_progress: "กำลังดำเนินการ",
+                      completed: "เสร็จสิ้น",
+                      cancelled: "ยกเลิก",
+                    }[s] || s}
                   </option>
                 ))}
               </select>
@@ -265,11 +312,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Tour Type
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="tour_type"
-                    value={formData.tour_type || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.tour_type || ""}
+                    options={tourTypes.map((t) => t.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Tour type"
                   />
                 </div>
               </div>
@@ -290,11 +339,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Hotel
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="tour_hotel"
-                    value={formData.tour_hotel || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.tour_hotel || ""}
+                    options={places.map((p) => p.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Hotel name"
                   />
                 </div>
                 <div>
@@ -312,11 +363,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Send To
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="send_to"
-                    value={formData.send_to || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.send_to || ""}
+                    options={tourRecipients.map((r) => r.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Send to"
                   />
                 </div>
               </div>
@@ -336,10 +389,11 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Province
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="province"
-                    value={formData.province || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.province || ""}
+                    options={provinces.map((p) => p.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
                     placeholder="Province"
                   />
@@ -365,11 +419,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Transfer Type
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="transfer_type"
-                    value={formData.transfer_type || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.transfer_type || ""}
+                    options={transferTypes.map((t) => t.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Transfer type"
                   />
                 </div>
               </div>
@@ -378,22 +434,26 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Pickup Location
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="pickup_location"
-                    value={formData.pickup_location || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.pickup_location || ""}
+                    options={places.map((p) => p.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Pickup location"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Drop Location
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="drop_location"
-                    value={formData.drop_location || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.drop_location || ""}
+                    options={places.map((p) => p.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Drop location"
                   />
                 </div>
               </div>
@@ -424,11 +484,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Send To
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="send_to"
-                    value={formData.send_to || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.send_to || ""}
+                    options={transferRecipients.map((r) => r.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Send to"
                   />
                 </div>
               </div>
@@ -437,11 +499,13 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Car Model
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="car_model"
-                    value={formData.car_model || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.car_model || ""}
+                    options={vehicles.map((v) => v.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
+                    placeholder="Car model"
                   />
                 </div>
                 <div>
@@ -459,10 +523,11 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Province
                   </label>
-                  <input
+                  <AutocompleteInput
                     name="province"
-                    value={formData.province || ""}
-                    onChange={handleChange}
+                    defaultValue={formData.province || ""}
+                    options={provinces.map((p) => p.value)}
+                    onChange={handleAutoChange}
                     className={inputClass}
                     placeholder="Province"
                   />
@@ -489,12 +554,12 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
           <div className="border border-gray-200 rounded-xl overflow-hidden">
             <div className="bg-gray-50 px-4 py-3 flex justify-between items-center">
               <h4 className="text-sm font-medium text-gray-600 flex items-center gap-1.5">
-                <DollarSign size={16} /> Finances
+                <DollarSign size={16} /> Payment
               </h4>
               <button
                 type="button"
                 onClick={addFinanceRow}
-                className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-${accentColor}-600 bg-${accentColor}-50 rounded-lg hover:bg-${accentColor}-100 transition-colors`}
+                className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${isTour ? "text-orange-600 bg-orange-50 hover:bg-orange-100" : "text-teal-600 bg-teal-50 hover:bg-teal-100"}`}
               >
                 <Plus size={14} /> Add
               </button>
@@ -512,12 +577,17 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                 </div>
 
                 {finances.map((row, index) => (
-                  <div key={row.id || `new-${index}`} className="grid grid-cols-12 gap-2 items-center">
+                  <div
+                    key={row.id || `new-${index}`}
+                    className="grid grid-cols-12 gap-2 items-center"
+                  >
                     <div className="col-span-3">
                       <input
                         type="number"
                         value={row.cost || 0}
-                        onChange={(e) => handleFinanceChange(index, "cost", e.target.value)}
+                        onChange={(e) =>
+                          handleFinanceChange(index, "cost", e.target.value)
+                        }
                         className={inputClass}
                         min="0"
                         step="0.01"
@@ -527,7 +597,9 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                       <input
                         type="number"
                         value={row.sell || 0}
-                        onChange={(e) => handleFinanceChange(index, "sell", e.target.value)}
+                        onChange={(e) =>
+                          handleFinanceChange(index, "sell", e.target.value)
+                        }
                         className={inputClass}
                         min="0"
                         step="0.01"
@@ -536,7 +608,9 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                     <div className="col-span-2">
                       <select
                         value={row.type || "all"}
-                        onChange={(e) => handleFinanceChange(index, "type", e.target.value)}
+                        onChange={(e) =>
+                          handleFinanceChange(index, "type", e.target.value)
+                        }
                         className={inputClass}
                       >
                         <option value="all">All</option>
@@ -547,7 +621,9 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                     <div className="col-span-3">
                       <input
                         value={row.remark || ""}
-                        onChange={(e) => handleFinanceChange(index, "remark", e.target.value)}
+                        onChange={(e) =>
+                          handleFinanceChange(index, "remark", e.target.value)
+                        }
                         className={inputClass}
                         placeholder="Remark"
                       />
@@ -567,13 +643,26 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
                 {/* Totals */}
                 <div className="grid grid-cols-12 gap-2 pt-3 border-t border-gray-200 text-sm font-medium">
                   <div className="col-span-3 text-gray-600 px-1">
-                    Total: <span className="text-red-500">{totalCost.toLocaleString()}</span>
+                    Total:{" "}
+                    <span className="text-red-500">
+                      {totalCost.toLocaleString()}
+                    </span>
                   </div>
                   <div className="col-span-3 text-gray-600 px-1">
-                    Total: <span className="text-green-600">{totalSell.toLocaleString()}</span>
+                    Total:{" "}
+                    <span className="text-green-600">
+                      {totalSell.toLocaleString()}
+                    </span>
                   </div>
                   <div className="col-span-6 text-right text-gray-600 px-1">
-                    Profit: <span className={totalProfit >= 0 ? "text-green-600" : "text-red-500"}>{totalProfit.toLocaleString()}</span>
+                    Profit:{" "}
+                    <span
+                      className={
+                        totalProfit >= 0 ? "text-green-600" : "text-red-500"
+                      }
+                    >
+                      {totalProfit.toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -605,7 +694,7 @@ const BookingDetailModal = ({ booking, bookingType, onClose, onRefresh }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`flex items-center gap-1.5 px-5 py-2 text-sm text-white bg-${accentColor}-600 rounded-lg hover:bg-${accentColor}-700 transition-colors disabled:opacity-50`}
+                className={`flex items-center gap-1.5 px-5 py-2 text-sm text-white rounded-lg transition-colors disabled:opacity-50 ${isTour ? "bg-orange-600 hover:bg-orange-700" : "bg-teal-600 hover:bg-teal-700"}`}
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">

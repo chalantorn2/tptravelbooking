@@ -38,6 +38,18 @@ export const deleteBooking = async (id) => {
   return { success: true, error: null };
 };
 
+// ===== Booking with details =====
+export const fetchBookingWithDetails = async (bookingId) => {
+  const [tourRes, transferRes] = await Promise.all([
+    api.get(`/tour-bookings/index.php?booking_id=${bookingId}`),
+    api.get(`/transfer-bookings/index.php?booking_id=${bookingId}`),
+  ]);
+  return {
+    tours: tourRes.data || [],
+    transfers: transferRes.data || [],
+  };
+};
+
 // ===== Tour Bookings =====
 export const fetchTourBookingsByDate = async (date) => {
   const { data, error } = await api.get(`/tour-bookings/index.php?date=${date}`);

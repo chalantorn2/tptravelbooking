@@ -17,4 +17,5 @@
 ### UX/UI
 - ธีมขาว-น้ำเงิน (ต้นแบบใช้ธีมมืด)
 - Sidebar ออกแบบแบบลอย มี gap รอบตัว ไม่ชิดขอบ
-- ไม่มี Export Excel / Print / Capture
+- มี Export Excel (ใช้ ExcelJS) ในหน้า Report
+- ไม่มี Print / Capture

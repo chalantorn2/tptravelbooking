@@ -4,13 +4,15 @@ import AutocompleteInput from '../ui/AutocompleteInput';
 import { useInformation } from '../../contexts/InformationContext';
 
 const TransferForm = memo(({ id, data, onRemove }) => {
-  const { transferTypes, places, provinces, transferRecipients, drivers, vehicles } = useInformation();
+  const { transferTypes, places, provinces, transferRecipients, drivers, vehicles, addNewInformation } = useInformation();
   const transferTypeOptions = transferTypes.map((t) => t.value);
   const placeOptions = places.map((p) => p.value);
   const provinceOptions = provinces.map((p) => p.value);
   const recipientOptions = transferRecipients.map((r) => r.value);
   const driverOptions = drivers.map((d) => d.value);
   const vehicleOptions = vehicles.map((v) => v.value);
+
+  const handleAddNew = (category) => (value) => addNewInformation({ category, value });
 
   const inputClass = 'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-400 transition-colors';
 
@@ -27,7 +29,11 @@ const TransferForm = memo(({ id, data, onRemove }) => {
       </div>
 
       <div className="p-4 space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Booking Ref</label>
+            <input name={`transfer_${id}_booking_ref`} defaultValue={data?.booking_ref || ''} className={inputClass} placeholder="Booking Ref" />
+          </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Transfer Date *</label>
             <input type="date" name={`transfer_${id}_date`} defaultValue={data?.transfer_date || ''} className={inputClass} required />
@@ -47,6 +53,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={transferTypeOptions}
               className={inputClass}
               placeholder="Transfer type"
+              onAddNew={handleAddNew('transfer_type')}
             />
           </div>
           <div>
@@ -57,6 +64,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={recipientOptions}
               className={inputClass}
               placeholder="Send to"
+              onAddNew={handleAddNew('transfer_recipient')}
             />
           </div>
         </div>
@@ -75,6 +83,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={placeOptions}
               className={inputClass}
               placeholder="Pickup location"
+              onAddNew={handleAddNew('place')}
             />
           </div>
           <div>
@@ -85,6 +94,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={placeOptions}
               className={inputClass}
               placeholder="Drop location"
+              onAddNew={handleAddNew('place')}
             />
           </div>
         </div>
@@ -109,6 +119,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={driverOptions}
               className={inputClass}
               placeholder="Driver name"
+              onAddNew={handleAddNew('driver')}
             />
           </div>
           <div>
@@ -119,6 +130,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={vehicleOptions}
               className={inputClass}
               placeholder="Car"
+              onAddNew={handleAddNew('vehicle')}
             />
           </div>
         </div>
@@ -136,6 +148,7 @@ const TransferForm = memo(({ id, data, onRemove }) => {
               options={provinceOptions}
               className={inputClass}
               placeholder="Province"
+              onAddNew={handleAddNew('province')}
             />
           </div>
         </div>
